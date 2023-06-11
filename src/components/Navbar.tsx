@@ -2,8 +2,9 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 
 const Navbar = () => {
+  
   return (
-    <div className="w-full min-w-[1500px] shadow-sm flex bg-gray-100">
+    <div className="w-screen shadow-sm flex bg-gray-100">
       <div className="flex justify-between">
         <span className="self-center text-2xl font-semibold whitespace-nowrap font-serif">
           Telus
