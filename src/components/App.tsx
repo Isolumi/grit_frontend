@@ -11,7 +11,7 @@ function App() {
       <div className='flex-none'>
         <Toolbar />
       </div>
-      <div className='flex-grow overflow-x-auto'>
+      <div className='flex-none'>
         <Content />
       </div>
     </div>
