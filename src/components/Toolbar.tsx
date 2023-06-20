@@ -12,6 +12,7 @@ import {
 import Searchbar from "./Searchbar";
 
 const Toolbar = () => {
+
   return (
     <div className="shadow-sm flex justify-start items-center h-12">
       <Form>
@@ -69,7 +70,9 @@ const Toolbar = () => {
         </button>
       </div>
 
-      <span><Searchbar /></span>
+      <span>
+        <Searchbar />
+      </span>
     </div>
   );
 };

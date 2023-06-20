@@ -1,21 +1,24 @@
-import Content from "./ContentTable";
+import ContentTable from "./ContentTable";
 import Navbar from "./Navbar";
 import Toolbar from "./Toolbar";
+import { BrowserRouter as Router } from "react-router-dom";
 
-function App() {
+const App = () => {
   return (
-    <div className="flex flex-col">
-      <div className='flex-none'>
-        <Navbar />
+    <Router>
+      <div className="flex flex-col">
+        <div className="flex-none">
+          <Navbar />
+        </div>
+        <div className="flex-none">
+          <Toolbar />
+        </div>
+        <div className="flex-none">
+          <ContentTable />
+        </div>
       </div>
-      <div className='flex-none'>
-        <Toolbar />
-      </div>
-      <div className='flex-none'>
-        <Content />
-      </div>
-    </div>
+    </Router>
   );
-}
+};
 
 export default App;

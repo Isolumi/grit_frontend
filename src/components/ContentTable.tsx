@@ -2,24 +2,38 @@ import { useMemo, useEffect, useState } from "react";
 import { useTable, Column } from "react-table";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+import { useLocation } from "react-router-dom";
 
 const ContentTable = () => {
+  const location = useLocation();
+
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const query = Number(new URLSearchParams(location.search).get('query'));
 
+
+  
   useEffect(() => {
     fetchData(currentPage);
-  }, [currentPage]);
+  }, [currentPage, location]);
 
   const fetchData = async (page: number) => {
+
+    let url;
     try {
+      if (query == 0) {
+        url = `http://localhost:8080/getTmfTransactions?page=${page}`;
+      } else {
+        url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
+      }
+      console.log(url);
       const response = await axios.get(
-        `http://localhost:8080/getTmfTransactions?page=${page}&`
+        url
       );
-      console.log(response.data);
       setData(response.data.content);
       setTotalPages(response.data.totalPages);
+
     } catch (e) {
       console.error("Error:", e);
     }
@@ -236,7 +250,10 @@ const ContentTable = () => {
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()} className='text-center align-middle'>
+                  <th
+                    {...column.getHeaderProps()}
+                    className="text-center align-middle"
+                  >
                     {column.render("Header")}
                   </th>
                 ))}
@@ -255,18 +272,16 @@ const ContentTable = () => {
                         padding: "10px",
                         border: "solid 1px gray",
                         background: i % 2 === 0 ? "lightgray" : "white",
-                        position: 'relative',
-                        height: '100%',
-                        overflow: 'hidden', // This will hide the overflowing content
-                        textOverflow: 'ellipsis', // This will add '...' if the content overflows
-                        whiteSpace: 'nowrap', // This will prevent text from breaking into a new line
+                        position: "relative",
+                        height: "100%",
+                        overflow: "hidden", // This will hide the overflowing content
+                        textOverflow: "ellipsis", // This will add '...' if the content overflows
+                        whiteSpace: "nowrap", // This will prevent text from breaking into a new line
                         minWidth: cell.column.minWidth,
-                        width: cell.column.width
+                        width: cell.column.width,
                       }}
                     >
-                      <div className="2">
-                        {cell.render("Cell")}
-                      </div>
+                      <div className="2">{cell.render("Cell")}</div>
                     </td>
                   ))}
                 </tr>
