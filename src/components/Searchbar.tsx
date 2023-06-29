@@ -4,7 +4,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from 'react-router-dom';
 
 const SearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState<string>();
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const navigate = useNavigate();
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {

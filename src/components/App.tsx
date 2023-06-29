@@ -1,4 +1,4 @@
-import ContentTable from "./ContentTable";
+import ContentTable from "./ContentTable/ContentTable";
 import Navbar from "./Navbar";
 import Toolbar from "./Toolbar";
 import { BrowserRouter as Router } from "react-router-dom";
