@@ -12,6 +12,13 @@
   border-color: black;
 }
 
+#headerBtn {
+  background: transparent;
+  color: black;
+  border-style: none;
+  font-weight: bold;
+}
+
 #searchBar {
   min-width: 600px;
   max-width: 600px;

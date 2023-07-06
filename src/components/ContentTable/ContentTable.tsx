@@ -32,7 +32,7 @@ function ContentTable() {
       } else if (query != 0){
         url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
       } else {
-        url = `http://localhost:8080/getFilteredTmfTransactions?${page}&activityCode=${activityCd}`;
+        url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&activityCode=${activityCd}`;
       }
       const response = await axios.get(url);
       setData(response.data.content);
@@ -51,17 +51,24 @@ function ContentTable() {
   };
 
   const handleFirstPage = () => {
-    setCurrentPage(0); // set current page in state
-    handlePageChange({ selected: 0 }); // handle page change
+    setCurrentPage(0);
+    handlePageChange({ selected: 0 });
   };
 
   const handleFilter = () => {
     navigate('/?activityCode=NAC')
   }
 
+  const [isChecked, setIsChecked] = useState(false);
+  const handleCheckBoxChange = (event: any) => {
+    setIsChecked(event.target.checked);
+    console.log(isChecked)
+  }
+
   return (
     <>
       <button onClick={handleFilter}>joe</button>
+      <input type="checkbox" checked={isChecked} onChange={handleCheckBoxChange} />
       <div className="hide-scrollbar flex-grow overflow-x-auto">
         <table {...getTableProps()} style={{ width: "100%" }}>
           <thead>
