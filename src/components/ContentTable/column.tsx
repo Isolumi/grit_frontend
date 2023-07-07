@@ -1,8 +1,16 @@
 import { Column } from "react-table";
 import { useMemo, useState } from "react";
-import { DropdownButton, Form } from "react-bootstrap";
+import { DropdownButton, Form, Button } from "react-bootstrap";
 
-export function getTableColumns(currentPage: number): Column<Data>[] {
+export function getTableColumns(currentPage: number, filters: Filters, setFilters: any): Column<Data>[] {
+  const handleFilters = (newFilters: {
+    bcc: boolean;
+    rcl: boolean;
+  }) => {
+    setFilters(newFilters)
+    setBtn(!btn);
+  };
+  const [btn, setBtn] = useState(false);
   return useMemo<Column<Data>[]>(
     () => [
       {
@@ -70,44 +78,44 @@ export function getTableColumns(currentPage: number): Column<Data>[] {
       },
       {
         Header: () => {
-          const [filters, setFilters] = useState({
-            bcc: false,
-            rcl: false,
+          const [currFilters, setCurrFilters] = useState({
+            bcc: filters.bcc,
+            rcl: filters.rcl,
           });
-          const handleCheckboxChange = (event: any) => {
-            setFilters({
-              ...filters,
+          const handleCurrFilters = (event: any) => {
+            setCurrFilters({
+              ...currFilters,
               [event.target.name]: event.target.checked,
             });
-            console.log('bcc: ' + filters.bcc)
-            console.log('rcl: ' + filters.rcl)
-          };
-
+          }
           return (
             <div>
               <DropdownButton id="headerBtn" title="Activity Code">
-                <Form>
-                  <div className="mr-3 ml-3 font-normal">
-                    <Form.Check
-                      name="bcc"
-                      type="checkbox"
-                      label="BCC"
-                      checked={filters.bcc}
-                      onChange={handleCheckboxChange}
-                    />
-                  </div>
-                </Form>
-                <Form>
-                  <div className="mr-3 ml-3 font-normal">
-                    <Form.Check
-                      name="rcl"
-                      type="checkbox"
-                      label="RCL"
-                      checked={filters.rcl}
-                      onChange={handleCheckboxChange}
-                    />
-                  </div>
-                </Form>
+                <div className="flex flex-col justify-center">
+                  <Form>
+                    <div className="mr-3 ml-3 font-normal">
+                      <Form.Check
+                        name="bcc"
+                        type="checkbox"
+                        label="BCC"
+                        checked={currFilters.bcc}
+                        onChange={handleCurrFilters}
+                      />
+                    </div>
+                  </Form>
+                  <Form>
+                    <div className="mr-3 ml-3 font-normal">
+                      <Form.Check
+                        name="rcl"
+                        type="checkbox"
+                        label="RCL"
+                        checked={currFilters.rcl}
+                        onChange={handleCurrFilters}
+                      />
+                    </div>
+                  </Form>
+                  <Button size='sm' onClick={() => handleFilters(currFilters)}>Filter</Button>
+                </div>
               </DropdownButton>
             </div>
           );
@@ -153,25 +161,7 @@ export function getTableColumns(currentPage: number): Column<Data>[] {
         maxWidth: 200,
       },
       {
-        Header: () => {
-          const [isChecked, setChecked] = useState(false);
-
-          const handleCheckboxChange = (event: any) => {
-            setChecked(event.target.checked);
-            console.log(isChecked);
-          };
-          return (
-            <div>
-              <DropdownButton id="headerBtn" title="Status Code">
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={handleCheckboxChange}
-                />
-              </DropdownButton>
-            </div>
-          );
-        },
+        Header: "Status Code",
         accessor: "statusCd",
         width: 200,
         minWidth: 200,
@@ -220,6 +210,6 @@ export function getTableColumns(currentPage: number): Column<Data>[] {
         maxWidth: 200,
       },
     ],
-    [currentPage]
+    [currentPage, btn]
   );
 }

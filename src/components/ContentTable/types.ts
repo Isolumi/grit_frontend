@@ -28,3 +28,8 @@ interface Data {
       index: number;
     };
   }
+
+  interface Filters {
+    bcc: boolean;
+    rcl: boolean;
+  };

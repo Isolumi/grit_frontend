@@ -12,7 +12,16 @@ function ContentTable() {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const columns = getTableColumns(currentPage);
+  const [filters, setFilters] = useState({
+    bcc: false,
+    rcl: false,
+  });
+
+  const columns = getTableColumns(currentPage, filters, setFilters);
+
+  useEffect(() => {
+    console.log("filters: " + filters.bcc + " " + filters.rcl);
+  }, [filters])
 
   useEffect(() => {
     fetchData(currentPage);
@@ -22,8 +31,6 @@ function ContentTable() {
     const params = new URLSearchParams(location.search);
     const query = Number(params.get("query")) || 0;
     const activityCd = params.get("activityCode") || '';
-    const statusCd = params.get("statusCode") || '';
-    const externalId = params.get("externalId") || '';
     let url;
 
     try {
