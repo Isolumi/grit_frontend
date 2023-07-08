@@ -29,7 +29,20 @@ interface Data {
     };
   }
 
-  interface Filters {
-    bcc: boolean;
-    rcl: boolean;
-  };
+  interface AcFilters {
+    bcc: boolean,
+    rcl: boolean,
+    sch: boolean,
+    sus: boolean,
+    rsp: boolean,
+    nac: boolean,
+    ub: boolean,
+    bl: boolean,
+    can: boolean,
+    mcn: boolean,
+  }
+
+  interface ScFilters {
+    success: boolean,
+    error: boolean,
+  }

@@ -1,50 +1,72 @@
 import { useEffect, useState } from "react";
 import { useTable, ColumnInstance } from "react-table";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 import { getTableColumns } from "./column";
 
-
 function ContentTable() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [filters, setFilters] = useState({
+  const [acFilters, setAcFilters] = useState({
     bcc: false,
     rcl: false,
+    sch: false,
+    sus: false,
+    rsp: false,
+    nac: false,
+    ub: false,
+    bl: false,
+    can: false,
+    mcn: false,
+  });
+  const [scFilters, setScFilters] = useState({
+    success: false,
+    error: false,
   });
 
-  const columns = getTableColumns(currentPage, filters, setFilters);
-
-  useEffect(() => {
-    console.log("filters: " + filters.bcc + " " + filters.rcl);
-  }, [filters])
+  const columns = getTableColumns(
+    currentPage,
+    acFilters,
+    scFilters,
+    setAcFilters,
+    setScFilters
+  );
 
   useEffect(() => {
     fetchData(currentPage);
-  }, [currentPage, location]);
+  }, [currentPage, location, acFilters, scFilters]);
 
   async function fetchData(page: number) {
     const params = new URLSearchParams(location.search);
     const query = Number(params.get("query")) || 0;
-    const activityCd = params.get("activityCode") || '';
+
+    const acString = Object.entries(acFilters)
+      .filter(([, value]) => value)
+      .map(([key]) => `activityCode=${key.toUpperCase()}`)
+      .join("&");
+    const scString = Object.entries(scFilters)
+      .filter(([, value]) => value)
+      .map(([key]) => `statusCode=${key.toUpperCase()}`)
+      .join("&");
+
+    const filt = [acString, scString].filter(s => s !== '').join("&");
+
     let url;
 
     try {
-      if (query == 0 && activityCd == '') {
-        url = `http://localhost:8080/getTmfTransactions?page=${page}`;
-      } else if (query != 0){
+      if (query !== 0) {
         url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
+      } else if (filt !== "") {
+        url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&${filt}`;
       } else {
-        url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&activityCode=${activityCd}`;
+        url = `http://localhost:8080/getTmfTransactions?page=${page}`;
       }
       const response = await axios.get(url);
       setData(response.data.content);
       setTotalPages(response.data.totalPages);
-
     } catch (e) {
       console.error("Error:", e);
     }
@@ -62,21 +84,9 @@ function ContentTable() {
     handlePageChange({ selected: 0 });
   };
 
-  const handleFilter = () => {
-    navigate('/?activityCode=NAC')
-  }
-
-  const [isChecked, setIsChecked] = useState(false);
-  const handleCheckBoxChange = (event: any) => {
-    setIsChecked(event.target.checked);
-    console.log(isChecked)
-  }
-
   return (
     <>
-      <button onClick={handleFilter}>joe</button>
-      <input type="checkbox" checked={isChecked} onChange={handleCheckBoxChange} />
-      <div className="hide-scrollbar flex-grow overflow-x-auto">
+      <div className="min-h-[497px] border hide-scrollbar flex-grow overflow-x-auto">
         <table {...getTableProps()} style={{ width: "100%" }}>
           <thead>
             {headerGroups.map((headerGroup) => (

@@ -1,16 +1,27 @@
 import { Column } from "react-table";
 import { useMemo, useState } from "react";
-import { DropdownButton, Form, Button } from "react-bootstrap";
+import { DropdownButton, Button } from "react-bootstrap";
+import FilterBox from "./FilterBox";
 
-export function getTableColumns(currentPage: number, filters: Filters, setFilters: any): Column<Data>[] {
-  const handleFilters = (newFilters: {
-    bcc: boolean;
-    rcl: boolean;
-  }) => {
-    setFilters(newFilters)
+export function getTableColumns(
+  currentPage: number,
+  acFilters: AcFilters,
+  scFilters: ScFilters,
+  setAcFilters: any,
+  setScFilters: any,
+): Column<Data>[] {
+
+  const handleAcFilters = (newAcFilters: AcFilters) => {
+    setAcFilters(newAcFilters);
     setBtn(!btn);
   };
+  const handleScFilters = (newScFilters: ScFilters) => {
+    setScFilters(newScFilters);
+    setBtn(!btn);
+  };
+
   const [btn, setBtn] = useState(false);
+
   return useMemo<Column<Data>[]>(
     () => [
       {
@@ -79,42 +90,41 @@ export function getTableColumns(currentPage: number, filters: Filters, setFilter
       {
         Header: () => {
           const [currFilters, setCurrFilters] = useState({
-            bcc: filters.bcc,
-            rcl: filters.rcl,
+            bcc: acFilters.bcc,
+            rcl: acFilters.rcl,
+            sch: acFilters.sch,
+            sus: acFilters.sus,
+            rsp: acFilters.rsp,
+            nac: acFilters.nac,
+            ub: acFilters.ub,
+            bl: acFilters.bl,
+            can: acFilters.can,
+            mcn: acFilters.mcn,
           });
           const handleCurrFilters = (event: any) => {
             setCurrFilters({
               ...currFilters,
               [event.target.name]: event.target.checked,
             });
-          }
+          };
           return (
             <div>
               <DropdownButton id="headerBtn" title="Activity Code">
                 <div className="flex flex-col justify-center">
-                  <Form>
-                    <div className="mr-3 ml-3 font-normal">
-                      <Form.Check
-                        name="bcc"
-                        type="checkbox"
-                        label="BCC"
-                        checked={currFilters.bcc}
-                        onChange={handleCurrFilters}
-                      />
-                    </div>
-                  </Form>
-                  <Form>
-                    <div className="mr-3 ml-3 font-normal">
-                      <Form.Check
-                        name="rcl"
-                        type="checkbox"
-                        label="RCL"
-                        checked={currFilters.rcl}
-                        onChange={handleCurrFilters}
-                      />
-                    </div>
-                  </Form>
-                  <Button size='sm' onClick={() => handleFilters(currFilters)}>Filter</Button>
+                  <FilterBox id='bcc' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='rcl' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='sch' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='sus' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='rsp' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='nac' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='ub' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='bl' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='can' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='mcn' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  
+                  <Button size="sm" onClick={() => handleAcFilters(currFilters)}>
+                    Filter
+                  </Button>
                 </div>
               </DropdownButton>
             </div>
@@ -161,7 +171,32 @@ export function getTableColumns(currentPage: number, filters: Filters, setFilter
         maxWidth: 200,
       },
       {
-        Header: "Status Code",
+        Header: () => {
+          const [currFilters, setCurrFilters] = useState({
+            success: scFilters.success,
+            error: scFilters.error,
+          });
+          const handleCurrFilters = (event: any) => {
+            setCurrFilters({
+              ...currFilters,
+              [event.target.name]: event.target.checked,
+            });
+          };
+          return (
+            <div>
+              <DropdownButton id="headerBtn" title="Status Code">
+                <div className="flex flex-col justify-center">
+                  <FilterBox id='success' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  <FilterBox id='error' filters={currFilters} handleFilters={handleCurrFilters}/>
+                  
+                  <Button size="sm" onClick={() => handleScFilters(currFilters)}>
+                    Filter
+                  </Button>
+                </div>
+              </DropdownButton>
+            </div>
+          );
+        },
         accessor: "statusCd",
         width: 200,
         minWidth: 200,
