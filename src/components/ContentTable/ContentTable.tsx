@@ -5,7 +5,11 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 import { getTableColumns } from "./column";
 
-function ContentTable() {
+interface RefreshProps {
+  refresh: boolean;
+}
+
+function ContentTable({ refresh }: RefreshProps) {
   const location = useLocation();
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -36,6 +40,26 @@ function ContentTable() {
   );
 
   useEffect(() => {
+    setAcFilters({
+      bcc: false,
+      rcl: false,
+      sch: false,
+      sus: false,
+      rsp: false,
+      nac: false,
+      ub: false,
+      bl: false,
+      can: false,
+      mcn: false,
+    });
+    setScFilters({
+      success: false,
+      error: false,
+    });
+    console.log(refresh);
+  }, [refresh]);
+
+  useEffect(() => {
     fetchData(currentPage);
   }, [currentPage, location, acFilters, scFilters]);
 
@@ -52,7 +76,7 @@ function ContentTable() {
       .map(([key]) => `statusCode=${key.toUpperCase()}`)
       .join("&");
 
-    const filt = [acString, scString].filter(s => s !== '').join("&");
+    const filt = [acString, scString].filter((s) => s !== "").join("&");
 
     let url;
 

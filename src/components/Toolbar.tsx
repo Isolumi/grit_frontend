@@ -11,8 +11,11 @@ import {
 } from "react-icons/fa";
 import Searchbar from "./Searchbar";
 
-const Toolbar = () => {
-
+interface RefreshProps {
+  refresh: boolean;
+  setRefresh: any
+}
+const Toolbar: React.FC<RefreshProps> = ({refresh, setRefresh}) => {
   return (
     <div className="shadow-sm flex justify-start items-center h-12">
       <Form>
@@ -20,7 +23,7 @@ const Toolbar = () => {
       </Form>
 
       <div className="min-w-[800px] max-w-[800px] flex justify-between">
-        <button id="navBtn" className="btn btn-primary">
+        <button id="navBtn" className="btn btn-primary" onClick={() => setRefresh(!refresh)}>
           <div className="flex flex-row items-center">
             <FaRedoAlt />
             <span className="ml-1">Refresh</span>
