@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTable, ColumnInstance } from "react-table";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
 import { getTableColumns } from "./column";
@@ -10,11 +10,12 @@ interface RefreshProps {
 }
 
 function ContentTable({ refresh }: RefreshProps) {
+  const navigate = useNavigate();
   const location = useLocation();
-  const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [acFilters, setAcFilters] = useState({
+  const [data, setData] = useState<Data[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [acFilters, setAcFilters] = useState<AcFilters>({
     bcc: false,
     rcl: false,
     sch: false,
@@ -26,11 +27,10 @@ function ContentTable({ refresh }: RefreshProps) {
     can: false,
     mcn: false,
   });
-  const [scFilters, setScFilters] = useState({
+  const [scFilters, setScFilters] = useState<ScFilters>({
     success: false,
     error: false,
   });
-
   const columns = getTableColumns(
     currentPage,
     acFilters,
@@ -56,17 +56,25 @@ function ContentTable({ refresh }: RefreshProps) {
       success: false,
       error: false,
     });
-    console.log(refresh);
+    navigate("/");
   }, [refresh]);
 
   useEffect(() => {
-    fetchData(currentPage);
+    if (
+      ["/billingAccountNum", "/externalId", "/subscriberNum"].includes(
+        location.pathname
+      )
+    ) {
+      const path: string = location.pathname.slice(1);
+      getUnique(path as keyof Data);
+    } else {
+      fetchData(currentPage);
+    }
   }, [currentPage, location, acFilters, scFilters]);
 
   async function fetchData(page: number) {
     const params = new URLSearchParams(location.search);
     const query = Number(params.get("query")) || 0;
-
     const acString = Object.entries(acFilters)
       .filter(([, value]) => value)
       .map(([key]) => `activityCode=${key.toUpperCase()}`)
@@ -81,33 +89,47 @@ function ContentTable({ refresh }: RefreshProps) {
     let url;
 
     try {
-      if (query !== 0) {
+      if (location.pathname === "/BAN") {
         url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
-      } else if (filt !== "") {
-        url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&${filt}`;
       } else {
-        url = `http://localhost:8080/getTmfTransactions?page=${page}`;
+        if (query !== 0) {
+          url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
+        } else if (filt !== "") {
+          url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&${filt}`;
+        } else {
+          url = `http://localhost:8080/getTmfTransactions?page=${page}`;
+        }
       }
       const response = await axios.get(url);
       setData(response.data.content);
       setTotalPages(response.data.totalPages);
     } catch (e) {
-      console.error("Error:", e);
+      console.error("Error: ", e);
     }
+  }
+
+  function getUnique(col: keyof Data) {
+    const seen = new Set();
+    setData(
+      data.filter((el) => {
+        const duplicate = seen.has(el[col]);
+        seen.add(el[col]);
+        return !duplicate;
+      })
+    );
   }
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
-
   const handlePageChange = (event: { selected: number }) => {
     setCurrentPage(event.selected);
   };
-
   const handleFirstPage = () => {
     setCurrentPage(0);
     handlePageChange({ selected: 0 });
   };
 
+  
   return (
     <>
       <div className="min-h-[497px] border hide-scrollbar flex-grow overflow-x-auto">

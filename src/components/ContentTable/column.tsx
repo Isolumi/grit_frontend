@@ -2,6 +2,7 @@ import { Column } from "react-table";
 import { useMemo, useState } from "react";
 import { DropdownButton, Button } from "react-bootstrap";
 import FilterBox from "./FilterBox";
+import { useNavigate } from "react-router-dom";
 
 export function getTableColumns(
   currentPage: number,
@@ -10,6 +11,7 @@ export function getTableColumns(
   setAcFilters: any,
   setScFilters: any,
 ): Column<Data>[] {
+  const nav = useNavigate();
 
   const handleAcFilters = (newAcFilters: AcFilters) => {
     setAcFilters(newAcFilters);
@@ -67,11 +69,21 @@ export function getTableColumns(
         accessor: "txnEffectiveTs",
       },
       {
-        Header: "Billing Account Num",
+        Header: () => {
+          const handleOnClick = () => {
+            nav('billingAccountNum');
+          }
+          return (
+            <Button id="headerBtn" onClick={handleOnClick}>Billing Account Number</Button>
+          );
+        },
         accessor: "billingAccountNum",
-        width: 200,
-        minWidth: 200,
-        maxWidth: 200,
+        Cell: ({ cell }: { cell: any }) => (
+          <Button id="cellBtn">{cell.row.original.billingAccountNum}</Button>
+        ),
+        width: 250,
+        minWidth: 250,
+        maxWidth: 250,
       },
       {
         Header: "External ID",
