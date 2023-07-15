@@ -36,7 +36,8 @@ function ContentTable({ refresh }: RefreshProps) {
     acFilters,
     scFilters,
     setAcFilters,
-    setScFilters
+    setScFilters,
+    data
   );
 
   useEffect(() => {
@@ -60,16 +61,7 @@ function ContentTable({ refresh }: RefreshProps) {
   }, [refresh]);
 
   useEffect(() => {
-    if (
-      ["/billingAccountNum", "/externalId", "/subscriberNum"].includes(
-        location.pathname
-      )
-    ) {
-      const path: string = location.pathname.slice(1);
-      getUnique(path as keyof Data);
-    } else {
-      fetchData(currentPage);
-    }
+    fetchData(currentPage);
   }, [currentPage, location, acFilters, scFilters]);
 
   async function fetchData(page: number) {
@@ -89,34 +81,20 @@ function ContentTable({ refresh }: RefreshProps) {
     let url;
 
     try {
-      if (location.pathname === "/BAN") {
+      if (query !== 0) {
         url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
+      } else if (filt !== "") {
+        url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&${filt}`;
       } else {
-        if (query !== 0) {
-          url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
-        } else if (filt !== "") {
-          url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&${filt}`;
-        } else {
-          url = `http://localhost:8080/getTmfTransactions?page=${page}`;
-        }
+        url = `http://localhost:8080/getTmfTransactions?page=${page}`;
       }
+
       const response = await axios.get(url);
       setData(response.data.content);
       setTotalPages(response.data.totalPages);
     } catch (e) {
       console.error("Error: ", e);
     }
-  }
-
-  function getUnique(col: keyof Data) {
-    const seen = new Set();
-    setData(
-      data.filter((el) => {
-        const duplicate = seen.has(el[col]);
-        seen.add(el[col]);
-        return !duplicate;
-      })
-    );
   }
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -129,7 +107,6 @@ function ContentTable({ refresh }: RefreshProps) {
     handlePageChange({ selected: 0 });
   };
 
-  
   return (
     <>
       <div className="min-h-[497px] border hide-scrollbar flex-grow overflow-x-auto">
