@@ -67,6 +67,7 @@ function ContentTable({ refresh }: RefreshProps) {
   async function fetchData(page: number) {
     const params = new URLSearchParams(location.search);
     const query = Number(params.get("query")) || 0;
+    const ban = Number(params.get("BAN")) || 0;
     const acString = Object.entries(acFilters)
       .filter(([, value]) => value)
       .map(([key]) => `activityCode=${key.toUpperCase()}`)
@@ -81,7 +82,9 @@ function ContentTable({ refresh }: RefreshProps) {
     let url;
 
     try {
-      if (query !== 0) {
+      if (ban !== 0) {
+        url = `http://localhost:8080/getBAN?page=${page}&id=${ban}`;
+      } else if (query !== 0) {
         url = `http://localhost:8080/getTmfTransactions?page=${page}&query=${query}`;
       } else if (filt !== "") {
         url = `http://localhost:8080/getFilteredTmfTransactions?page=${page}&${filt}`;

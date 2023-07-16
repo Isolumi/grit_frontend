@@ -1,7 +1,8 @@
 import { Column } from "react-table";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { DropdownButton, Button, Dropdown } from "react-bootstrap";
 import FilterBox from "./FilterBox";
+import { useNavigate } from "react-router-dom";
 
 export function getTableColumns(
   currentPage: number,
@@ -11,9 +12,7 @@ export function getTableColumns(
   setScFilters: any,
   data: Data[]
 ): Column<Data>[] {
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  const navigate = useNavigate();
 
   const handleAcFilters = (newAcFilters: AcFilters) => {
     setAcFilters(newAcFilters);
@@ -91,7 +90,7 @@ export function getTableColumns(
               onClick={handleData}
             >
               {newData.map((item, index) => (
-                <Dropdown.Item key={index} eventKey={index}>
+                <Dropdown.Item key={index} eventKey={index} onClick={() => {navigate(`/?BAN=${item.billingAccountNum}`)}}>
                   {item.billingAccountNum.toString()}
                 </Dropdown.Item>
               ))}
