@@ -1,5 +1,5 @@
 import { Column } from "react-table";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { DropdownButton, Button, Dropdown } from "react-bootstrap";
 import FilterBox from "./FilterBox";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,23 @@ export function getTableColumns(
   };
 
   const [btn, setBtn] = useState(false);
+  const [isFilter, setIsFilter] = useState<boolean>(false);
+  const [displayedData, setDisplayedData] = useState<Data[]>([]);
+
+  useEffect(() => {
+    if (!isFilter) {
+      console.log('false');
+      const seen = new Set();
+      const uniqueData = data.filter((el) => {
+        const duplicate = seen.has(el.billingAccountNum);
+        seen.add(el.billingAccountNum);
+        return !duplicate;
+      });
+      setDisplayedData(uniqueData);
+    } else {
+      console.log('true');
+    }
+  }, [data]);
 
   return useMemo<Column<Data>[]>(
     () => [
@@ -71,29 +88,31 @@ export function getTableColumns(
       },
       {
         Header: () => {
-          const [newData, setNewData] = useState(data);
-          const handleData = () => {
-            const seen = new Set();
-            setNewData(
-              data.filter((el) => {
-                const duplicate = seen.has(el.billingAccountNum);
-                seen.add(el.billingAccountNum);
-                return !duplicate;
-              })
-            );
+          const handleFilterSelect = (item: Data) => {
+            setIsFilter(true);
+            navigate(`/?BAN=${item.billingAccountNum}`);
           };
+          const handleBtn = () => {
+            setIsFilter(false);
+            navigate(`/`)
+          }
 
           return (
-            <DropdownButton
-              id="headerBtn"
-              title="Billing Account Number"
-              onClick={handleData}
-            >
-              {newData.map((item, index) => (
-                <Dropdown.Item key={index} eventKey={index} onClick={() => {navigate(`/?BAN=${item.billingAccountNum}`)}}>
-                  {item.billingAccountNum.toString()}
-                </Dropdown.Item>
-              ))}
+            <DropdownButton id="headerBtn" title="Billing Account Number">
+              <div className="flex flex-col justify-center">
+                {displayedData.map((item, index) => (
+                  <Dropdown.Item
+                    key={index}
+                    eventKey={index}
+                    onClick={() => {
+                      handleFilterSelect(item);
+                    }}
+                  >
+                    {item.billingAccountNum.toString()}
+                  </Dropdown.Item>
+                ))}
+                <Button size="sm" onClick={handleBtn}>Reset</Button>
+              </div>
             </DropdownButton>
           );
         },
@@ -328,6 +347,6 @@ export function getTableColumns(
         maxWidth: 200,
       },
     ],
-    [currentPage, btn, data]
+    [currentPage, btn, data, isFilter]
   );
 }
